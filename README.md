@@ -1,5 +1,7 @@
 # [Django Material Dashboard](https://appseed.us/product/material-dashboard/django/)
 
+DOW Jones 30 Sentiment Analyzer built using the Django Material Dashboard and Deepnote ML.
+
 Open-source **Django** project crafted on top of **[Material Dashboard](https://appseed.us/product/material-dashboard/django/)**, an open-source `Boostrap 5` design from [Creative-Tim](https://www.creative-tim.com/?AFFILIATE=128200)
 The product is designed to deliver the best possible user experience with highly customizable feature-rich pages. `Material Material` has easy and intuitive responsive design whether it is viewed on retina screens or laptops.
 
