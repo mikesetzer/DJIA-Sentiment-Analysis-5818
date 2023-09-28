@@ -1,9 +1,5 @@
-import os
-
 from finnhub import Client
 from datetime import datetime, timezone
-
-
 
 # https://finnhub.io/docs/api/stock-candles
 def get_daily_closing_stock_prices(finnhub_api_key, ticker, dt_from, dt_to):
@@ -24,7 +20,13 @@ def get_daily_closing_stock_prices(finnhub_api_key, ticker, dt_from, dt_to):
 
     return price_dict
 
-#
+
+
+
+
+
+
+
 # from dotenv import load_dotenv
 # load_dotenv()  # take environment variables from .env.
 # def test_get_daily_closing_stock_prices():
