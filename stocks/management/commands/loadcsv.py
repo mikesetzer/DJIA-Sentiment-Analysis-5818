@@ -83,14 +83,15 @@ class Command(BaseCommand):
             stock = Stock.objects.get(company=data_dict['sentiment_score_company'])
 
             # Need to convert date format from "01/14/2022" to "2022-01-14"
-            sentiment_score_date = date_object = datetime.strptime(data_dict['sentiment_score_date'],
-                                                                   '%m/%d/%Y').date().strftime('%Y-%m-%d')
+            sentiment_score_date = datetime.strptime(data_dict['sentiment_score_date'],
+                                                     '%m/%d/%Y').date().strftime('%Y-%m-%d')
 
             ss, created = SentimentScore.objects.get_or_create(stock=stock,
                                                                date=sentiment_score_date,
-                                                               score=data_dict['sentiment_score_score'],
-                                                               recommendation=data_dict[
-                                                                   'sentiment_score_recommendation'])
+                                                               defaults={'score': data_dict['sentiment_score_score'],
+                                                                         'recommendation': data_dict[
+                                                                             'sentiment_score_recommendation']
+                                                                         })
 
             if created:
                 print('Created SentimentScore "{}" "{}" "{}" "{}"'.format(stock.ticker, ss.date, ss.score,
