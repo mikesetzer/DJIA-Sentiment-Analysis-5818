@@ -8,9 +8,13 @@ from finnhub import Client
 def get_finhub_stock_candles(ticker, dt_from, dt_to):
     finnhub_api_key = os.getenv("FINNHUB_API_KEY")
 
+    # Convert from date to datetime
+    datetime_from = datetime(dt_from.year, dt_from.month, dt_from.day)
+    datetime_to = datetime(dt_to.year, dt_to.month, dt_to.day)
+
     # Convert from datetime to UNIX timestamp
-    int_from = int(round(dt_from.timestamp()))
-    int_to = int(round(dt_to.timestamp()))
+    int_from = int(round(datetime_from.timestamp()))
+    int_to = int(round(datetime_to.timestamp()))
 
     # Setup client
     finnhub_client = Client(api_key=finnhub_api_key)
