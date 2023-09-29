@@ -4,5 +4,7 @@ from . import views
 
 urlpatterns = [
     path('stocks/', views.stocks, name='stocks'),
-    path('stocks_load_history/', views.stocks_load_history, name='stocks_load_history'),
+    path('pricehistory/', views.stocks_view_price_history, name='stocks_load_price_history'),
+    path('loadprices/', views.stocks_load_price_history, name='stocks_load_history'),
+    path('sentiment/', views.sentiment_score, name='sentiment_score'),
 ]

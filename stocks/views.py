@@ -2,7 +2,7 @@ from datetime import datetime, date, timedelta
 
 from django.shortcuts import render
 
-from .models import Stock, StockPrice
+from .models import Stock, StockPrice, SentimentScore
 from .stock_api import get_closing_stock_price_on_date, get_closing_stock_prices_date_range
 
 
@@ -17,19 +17,40 @@ def stocks(request):
     return render(request, "stocks/stocks.html", {"ticker": ticker, "price_date": price_date, "price": price})
 
 
-# Populates database with stock price history if no history is available
-def stocks_load_history(request):
-    # http://127.0.0.1:8000/stocks_load_history
+# Retrieve and display recent sentiment scores for the given ticker
+def sentiment_score(request):
+    # http://127.0.0.1:8000/sentiment?ticker=AAPL
+    ticker = request.GET.get("ticker") or "AAPL"
+    print('Sentiment for stock "{}"'.format(ticker))
+    sentiment_scores = get_recent_sentiment_scores(ticker)
+    return render(request, "stocks/sentiment.html", {"ticker": ticker, "sentiment_scores": sentiment_scores})
 
-    sp = StockPrice.objects.first()
-    if sp:
+
+def stocks_view_price_history(request):
+    # http://127.0.0.1:8000/pricehistory?ticker=AAPL
+    ticker = request.GET.get("ticker") or "AAPL"
+    print('Price history for stock "{}"'.format(ticker))
+    stock_prices = get_recent_stock_prices(ticker)
+    return render(request, "stocks/pricehistory.html", {"ticker": ticker, "stock_prices": stock_prices})
+
+
+# Populates database with stock price history if no history is available
+def stocks_load_price_history(request):
+    # http://127.0.0.1:8000/loadprices
+
+    # sp = StockPrice.objects.first()
+    stock_prices = get_recent_stock_prices()
+    if stock_prices:
+        sp = stock_prices[0]
         print('StockPrice already present "{}" "{}" "{}"'.format(sp.stock.ticker, sp.date, sp.price))
     else:
         price_count = test_bulk_load_db_stock_price_history()
-        sp = StockPrice.objects.first()
+        stock_prices = get_recent_stock_prices()
+        sp = stock_prices[0]
+        # sp = StockPrice.objects.first()
         print('StockPrice history loaded "{}" "{}" "{}" "{}"'.format(sp.stock.ticker, sp.date, sp.price, price_count))
 
-    return render(request, "stocks/stocks.html", {"ticker": sp.stock.ticker, "price_date": sp.date, "price": sp.price})
+    return render(request, "stocks/pricehistory.html", {"ticker": "All", "stock_prices": stock_prices})
 
 
 def get_or_lookup_stock_price(ticker, price_date):
@@ -74,3 +95,30 @@ def test_bulk_load_db_stock_price_history():
                 price_count += 1
 
     return price_count
+
+
+def get_recent_sentiment_scores(ticker):
+    sentiment_scores = None
+    s = Stock.objects.filter(ticker=ticker).first()
+    if s:
+        sentiment_scores = SentimentScore.objects.filter(stock=s).order_by('-date')[:10]
+    else:
+        print('Stock not found "{}"'.format(ticker))
+
+    return sentiment_scores
+
+
+# Get the most recent stock prices for the given ticker
+def get_recent_stock_prices(ticker="", max_records=20):
+    stock_prices = None
+
+    if ticker:
+        s = Stock.objects.filter(ticker=ticker).first()
+        if s:
+            stock_prices = StockPrice.objects.filter(stock=s).order_by('-date')[:max_records]
+        else:
+            print('Stock not found "{}"'.format(ticker))
+    if not stock_prices:
+        stock_prices = StockPrice.objects.order_by('-date')[:max_records]
+
+    return stock_prices
