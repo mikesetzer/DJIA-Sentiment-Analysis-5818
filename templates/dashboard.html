@@ -1,0 +1,44 @@
+{% extends 'home/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row vh-60">
+        <div class="col-12 col-lg-6 py-3">
+            <h2 class="d-inline-block">{{ stock.name }}</h2>
+            <h3 class="d-inline-block">{{ stock.recommendation }}</h3>
+            <div class="candlesticks mt-3">
+                <!-- Candlesticks Section -->
+            </div>
+            <div class="financial-data mt-3">
+                <p>Price: {{ stock.price }}</p>
+                <p>Market Cap: {{ stock.market_cap }}</p>
+                <!-- Other Financial Data -->
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 py-3">
+            <h3>News</h3>
+            {% for news in news_list %}
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{{ news.image_url }}" class="img-fluid rounded-start" alt="{{ news.title }}">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ news.title }}</h5>
+                                <p class="card-text">{{ news.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <a href="{% url 'more_news' %}" class="text-decoration-none">More News</a>
+        </div>
+    </div>
+    <div class="row vh-40">
+        <div class="col-12 py-3">
+            {% include 'home/stocks_table.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}
