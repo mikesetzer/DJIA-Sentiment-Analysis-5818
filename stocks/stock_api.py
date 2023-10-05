@@ -43,6 +43,23 @@ def get_closing_stock_price_on_date(ticker, dt_price):
 
     return stock_price
 
+
+def get_stock_candle_info(ticker, dt_price):
+    candle_info = {}
+
+    candles = get_finhub_stock_candles(ticker, dt_price, dt_price)
+
+    if candles and candles['s'] != 'no_data':
+        candle_info['ticker'] = ticker
+        candle_info['date'] = dt_price
+        candle_info['close_price'] = candles['c'][0]
+        candle_info['high_price'] = candles['h'][0]
+        candle_info['low_price'] = candles['l'][0]
+        candle_info['open_price'] = candles['o'][0]
+        candle_info['volume'] = candles['v'][0]
+
+    return candle_info
+
 # from dotenv import load_dotenv
 # load_dotenv()  # take environment variables from .env.
 # def test_get_daily_closing_stock_prices():

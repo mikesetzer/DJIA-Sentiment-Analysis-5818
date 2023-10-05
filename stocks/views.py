@@ -3,7 +3,7 @@ from datetime import datetime, date, timedelta
 from django.shortcuts import render
 
 from .models import Stock, StockPrice, SentimentScore
-from .stock_api import get_closing_stock_price_on_date, get_closing_stock_prices_date_range
+from .stock_api import get_closing_stock_price_on_date, get_closing_stock_prices_date_range, get_stock_candle_info
 
 
 # Retrieve and display stock price information for the given ticker on the given date
@@ -15,6 +15,17 @@ def stocks(request):
     print('View for stocks "{}" "{}"'.format(ticker, price_date))
     price = get_or_lookup_stock_price(ticker, price_date)
     return render(request, "stocks/stocks.html", {"ticker": ticker, "price_date": price_date, "price": price})
+
+
+# Retrieve and display stock price information for the given ticker on the given date
+def stock_details(request):
+    # http://127.0.0.1:8000/stock_details?ticker=AAPL&price_date=2023-07-31
+    ticker = request.GET.get("ticker") or "AAPL"
+    price_date = request.GET.get("price_date") or (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    price_date = datetime.strptime(price_date, "%Y-%m-%d").date()
+    print('View for stock_details "{}" "{}"'.format(ticker, price_date))
+    stock_dtl = get_stock_details(ticker, price_date)
+    return render(request, "stocks/stockdetails.html", stock_dtl)
 
 
 # Retrieve and display recent sentiment scores for the given ticker
@@ -72,6 +83,21 @@ def get_or_lookup_stock_price(ticker, price_date):
                 print('StockPrice not found "{}" "{}" "{}"'.format(s.ticker, price_date, stock_price))
 
     return stock_price
+
+
+def get_stock_details(ticker, price_date):
+    stock_dtl = {}
+    s = Stock.objects.filter(ticker=ticker).first()
+    if not s:
+        print('Stock not found "{}" "{}"'.format(ticker, price_date))
+    else:
+        stock_dtl = get_stock_candle_info(ticker, price_date)
+        if stock_dtl:
+            print('Stock details: "{}"'.format(stock_dtl))
+        else:
+            print('Stock details not found "{}" "{}"'.format(ticker, price_date))
+
+    return stock_dtl
 
 
 # Populates database with stock price history from finhub.
