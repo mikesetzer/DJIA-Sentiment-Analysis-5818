@@ -2,7 +2,7 @@ from datetime import datetime, date, timedelta
 
 from django.shortcuts import render
 
-from .models import Stock, StockPrice, SentimentScore
+from .models import Stock, StockPrice, SentimentScore, Recommendation
 from .stock_api import get_closing_stock_price_on_date, get_closing_stock_prices_date_range, get_stock_candle_info
 
 
@@ -35,6 +35,23 @@ def sentiment_score(request):
     print('Sentiment for stock "{}"'.format(ticker))
     sentiment_scores = get_recent_sentiment_scores(ticker)
     return render(request, "stocks/sentiment.html", {"ticker": ticker, "sentiment_scores": sentiment_scores})
+
+
+
+
+
+
+def stock_recommendations(request):
+    # http://127.0.0.1:8000/recommendations?ticker=AAPL
+    ticker = request.GET.get("ticker") or "AAPL"
+    print('Recommendations for stock "{}"'.format(ticker))
+    recommendations = get_recent_stock_recommendations(ticker)
+    return render(request, "stocks/recommendations.html", {"ticker": ticker, "recommendations": recommendations})
+
+
+
+
+
 
 
 def stocks_view_price_history(request):
@@ -148,3 +165,19 @@ def get_recent_stock_prices(ticker="", max_records=20):
         stock_prices = StockPrice.objects.order_by('-date')[:max_records]
 
     return stock_prices
+
+
+# Get the most recent stock prices for the given ticker
+def get_recent_stock_recommendations(ticker="", max_records=20):
+    stock_rec = None
+
+    if ticker:
+        s = Stock.objects.filter(ticker=ticker).first()
+        if s:
+            stock_rec = Recommendation.objects.filter(stock=s).order_by('-date')[:max_records]
+        else:
+            print('Stock not found "{}"'.format(ticker))
+    if not stock_rec:
+        stock_rec = Recommendation.objects.order_by('-date')[:max_records]
+
+    return stock_rec

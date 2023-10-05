@@ -1,5 +1,6 @@
 # python.exe .\manage.py loadcsv --csv .\stocks\management\commands\InitialDJIAStockData.csv
 # python.exe .\manage.py loadcsv --csv .\stocks\management\commands\sentiment.csv
+# python.exe .\manage.py loadcsv --csv .\stocks\management\commands\recommendation.csv
 
 import csv
 import re
@@ -8,7 +9,7 @@ from datetime import datetime
 # from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
-from stocks.models import Stock, Portfolio, SentimentScore
+from stocks.models import Stock, Portfolio, SentimentScore, Recommendation
 
 
 class Command(BaseCommand):
@@ -55,17 +56,15 @@ class Command(BaseCommand):
             raise CommandError('File "{}" does not exist'.format(options['csv']))
 
         for data_dict in models.get('Stock', []):
-            s, created = Stock.objects.get_or_create(ticker=data_dict['stock_ticker'], defaults={
-                'company': data_dict['stock_company']
-            })
+            s, created = Stock.objects.get_or_create(ticker=data_dict['stock_ticker'],
+                                                     defaults={'company': data_dict['stock_company']})
 
             if created:
                 print('Created Stock "{}"'.format(s.ticker))
 
         for data_dict in models.get('Portfolio', []):
-            p, created = Portfolio.objects.get_or_create(name=data_dict['portfolio_name'], defaults={
-                'description': data_dict['portfolio_description']
-            })
+            p, created = Portfolio.objects.get_or_create(name=data_dict['portfolio_name'],
+                                                         defaults={'description': data_dict['portfolio_description']})
 
             if created:
                 print('Created Portfolio "{}"'.format(p.name))
@@ -83,18 +82,39 @@ class Command(BaseCommand):
             stock = Stock.objects.get(company=data_dict['sentiment_score_company'])
 
             # Need to convert date format from "01/14/2022" to "2022-01-14"
-            sentiment_score_date = datetime.strptime(data_dict['sentiment_score_date'],
-                                                     '%m/%d/%Y').date().strftime('%Y-%m-%d')
+            sentiment_score_date = datetime.strptime(data_dict['sentiment_score_date'], '%m/%d/%Y').date().strftime(
+                '%Y-%m-%d')
 
-            ss, created = SentimentScore.objects.get_or_create(stock=stock,
-                                                               date=sentiment_score_date,
+            ss, created = SentimentScore.objects.get_or_create(stock=stock, date=sentiment_score_date,
                                                                defaults={'score': data_dict['sentiment_score_score'],
                                                                          'recommendation': data_dict[
-                                                                             'sentiment_score_recommendation']
-                                                                         })
+                                                                             'sentiment_score_recommendation']})
 
             if created:
                 print('Created SentimentScore "{}" "{}" "{}" "{}"'.format(stock.ticker, ss.date, ss.score,
                                                                           ss.recommendation))
+
+        for data_dict in models.get('Recommendation', []):
+
+            # print('Started Recommendation "{}"'.format(data_dict['symbol']))
+
+            stock = Stock.objects.get(ticker=data_dict['symbol'])
+
+            # Need to convert date format from "01/14/2022" to "2022-01-14"
+            # recommendation_date = datetime.strptime(data_dict['date'], '%m/%d/%Y').date().strftime('%Y-%m-%d')
+            recommendation_date = data_dict['date']
+
+            rec, created = Recommendation.objects.get_or_create(stock=stock, date=recommendation_date, defaults={
+
+                'primary_key_text': data_dict['primary_key'], 'sentiment_score': data_dict['sentiment_score'],
+                'stock_recommendation': data_dict['stock_rec'], 'total_recommendation': data_dict['total_rec']
+
+            })
+
+            if created:
+                print('Created Recommendation "{}" "{}" "{}" "{}" "{}"'.format(stock.ticker, rec.date,
+                                                                               rec.sentiment_score,
+                                                                               rec.stock_recommendation,
+                                                                               rec.total_recommendation))
 
         print("Import complete")
