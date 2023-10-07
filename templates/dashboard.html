@@ -1,4 +1,4 @@
-{% extends 'home/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="container-fluid">
@@ -32,12 +32,12 @@
                     </div>
                 </div>
             {% endfor %}
-            <a href="{% url 'more_news' %}" class="text-decoration-none">More News</a>
+            <a href="#" class="text-decoration-none">More News</a>
         </div>
     </div>
     <div class="row vh-40">
         <div class="col-12 py-3">
-            {% include 'home/stocks_table.html' %}
+            {% include 'stocks_table.html' %}
         </div>
     </div>
 </div>

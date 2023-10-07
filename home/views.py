@@ -3,7 +3,7 @@ from django.http import HttpResponse
 
 # Create your views here.
 
-def index(request):
+def home_view(request):
 
     # Page from the theme 
-    return render(request, 'pages/index.html')
+    return render(request, 'dashboard.html')
