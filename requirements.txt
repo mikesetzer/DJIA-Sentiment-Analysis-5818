@@ -1,8 +1,10 @@
-django
+finnhub-python>=2.4.18
+django>=4.2.5
 gunicorn
-python-dotenv
+python-dotenv>=1.0.0
 whitenoise
 django-admin-material-dashboard==1.0.10
+
 
 # psycopg2-binary
 # mysqlclient
