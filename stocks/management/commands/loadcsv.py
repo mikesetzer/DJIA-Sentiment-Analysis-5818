@@ -1,6 +1,7 @@
 # python.exe .\manage.py loadcsv --csv .\stocks\management\commands\InitialDJIAStockData.csv
 # python.exe .\manage.py loadcsv --csv .\stocks\management\commands\sentiment.csv
 # python.exe .\manage.py loadcsv --csv .\stocks\management\commands\recommendation.csv
+# python.exe .\manage.py loadcsv --csv .\stocks\management\commands\COP_DJIA_Total_Dataset.csv
 
 import csv
 import re
