@@ -7,12 +7,14 @@
             <h2 class="d-inline-block">{{ stock.name }} ({{ stock.symbol }})</h2>
             <h3 class="d-inline-block">{{ stock.recommendation }}</h3>
             <div id="candlesticks" class="candlesticks mt-3">
-                <!-- Candlesticks Section: Consider embedding a JavaScript-based charting library for rendering candlesticks -->
+                <div id="candlestickChart" style="height: 300px;"></div>
             </div>
             <div class="financial-data mt-3">
-                <p>Price: {{ stock.price }}</p>
-                <p>Market Cap: {{ stock.market_cap }}</p>
-                <!-- Additional financial details can be added here -->
+                <p><strong>Current Price:</strong> ${{ stock.price }}</p>
+                <p><strong>Market Cap:</strong> ${{ stock.market_cap }} billion</p>
+                <p><strong>Opening Price:</strong> ${{ stock.open_price }}</p>
+                <p><strong>Highest Price (Today):</strong> ${{ stock.high_price }}</p>
+                <p><strong>Lowest Price (Today):</strong> ${{ stock.low_price }}</p>
             </div>
             <div class="buy-sell-recommendation mt-3">
                 <h4>Recommendation: <span class="{{ recommendation_class }}">{{ stock.recommendation }}</span></h4>
@@ -46,4 +48,26 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script src="https://cdn.your-chart-library.com/library.js"></script> <!-- Replace with your actual chart library CDN -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // This should be the actual data from your Django context, passed into the JavaScript code.
+    var candlestickData = {{ candlestick_data|safe }};
+
+    // Options and setup for your chart, this will depend heavily on what your chart library requires.
+    var options = {
+        series: [{
+            data: candlestickData  // this structure depends on your chart library's requirements
+        }],
+        // ... other options like axes, labels, colors, etc.
+    };
+
+    // Creating the chart inside the 'candlestickChart' container
+    var chart = new YourChartLibrary.createChart(document.getElementById('candlestickChart'), options);
+    // Replace 'YourChartLibrary.createChart' with the actual method your library uses
+});
+</script>
 {% endblock %}

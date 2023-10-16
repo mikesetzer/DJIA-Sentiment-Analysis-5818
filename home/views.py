@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from finnhub import Client
 import os
 from datetime import datetime
+import time
 
 
 # Create your views here.
@@ -79,29 +80,82 @@ def home_view(request):
 
 
 def stock_detail_view(request, symbol):
-    finnhub_api_key = os.getenv("FINNHUB_API_KEY")
+    finnhub_api_key = os.environ.get('FINNHUB_API_KEY')
 
     if finnhub_api_key is None:
         raise ValueError("API Key for Finnhub is missing!")
 
     finnhub_client = Client(api_key=finnhub_api_key)
 
-    # Replace with actual logic to fetch and process stock and news data
+    # Get general information about the company
+    company_info = finnhub_client.company_profile2(symbol=symbol)
+    if not company_info or 'name' not in company_info:
+        raise ValueError(f"No data available for symbol {symbol}")
+
+    # Get the current quote for the stock
+    quote = finnhub_client.quote(symbol)
+    if not quote or any(key not in quote for key in ('c', 'o', 'h', 'l')):
+        raise ValueError(f"No quote available for symbol {symbol}")
+
+    # Assuming 'recommendation' is calculated somehow based on available data
+    recommendation = "Buy"  # Placeholder, you should implement your logic here
+
+    # Construct the stock information dictionary
     stock = {
-        'name': 'Apple Inc.',
-        'recommendation': 'Buy',
-        'price': 150.00,
-        'market_cap': '2.41T',
-        # Add more properties as needed
+        'name': company_info['name'],
+        'recommendation': recommendation,
+        'price': quote['c'],  # current price
+        'market_cap': company_info.get('marketCapitalization', 'N/A'),  # Use 'N/A' if not available
+        'open_price': quote['o'],
+        'high_price': quote['h'],
+        'low_price': quote['l'],
     }
 
+    # Get the current date in the required format
     current_date = datetime.now().strftime("%Y-%m-%d")
-    # Example of fetching news from the Finnhub API, replace with actual logic
-    news_list = finnhub_client.company_news(symbol, _from="2022-01-01", to=current_date)[:5]
+
+    # Fetch news with a limit
+    news_params = {
+        'symbol': symbol,
+        '_from': "2022-01-01",  # Consider making this dynamic as well
+        'to': current_date
+    }
+    news_list = finnhub_client.company_news(**news_params)
+    if news_list is None or isinstance(news_list, dict):
+        news_list = []  # or handle it appropriately, maybe there was an error
+
+    current_timestamp = int(time.time())  # Current time in seconds since the epoch
+    ten_days_ago_timestamp = current_timestamp - (10 * 24 * 60 * 60)  # 10 days ago
+
+    # Fetching candlestick data
+    candlestick_data = finnhub_client.stock_candles(
+        symbol=symbol,
+        resolution='D',
+        _from=ten_days_ago_timestamp,  # 10 days ago
+        to=current_timestamp
+    )
+
+    # Validate candlestick data and prepare it for the frontend
+    if not candlestick_data or candlestick_data['s'] != 'ok':
+        prepared_candlestick_data = []  # Handle the lack of data appropriately
+    else:
+        # Structure of the candlestick data is different, we need to adjust the data parsing
+        prepared_candlestick_data = []
+        for i in range(len(candlestick_data['c'])):
+            ohlcv = {
+                'timestamp': candlestick_data['t'][i],
+                'open': candlestick_data['o'][i],
+                'high': candlestick_data['h'][i],
+                'low': candlestick_data['l'][i],
+                'close': candlestick_data['c'][i],
+                'volume': candlestick_data['v'][i]  # if volume data is needed
+            }
+            prepared_candlestick_data.append(ohlcv)
 
     context = {
         'stock': stock,
-        'news_list': news_list,
+        'news_list': news_list[:5],  # Limiting to 5 news items
+        'candlestick_data': prepared_candlestick_data,  # This can be used by a JS charting library
     }
 
     return render(request, 'stock_detail.html', context)
