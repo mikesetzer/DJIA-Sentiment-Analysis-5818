@@ -7,10 +7,13 @@
             <h2 class="d-inline-block">{{ stock.name }} ({{ stock.symbol }})</h2>
             <h3 class="d-inline-block">{{ stock.recommendation }}</h3>
             <div id="candlesticks" class="candlesticks mt-3">
+                <!-- Candlestick chart will be rendered here -->
                 <div id="candlestickChart" style="height: 300px;"></div>
             </div>
             <div class="financial-data mt-3">
                 <p><strong>Current Price:</strong> ${{ stock.price }}</p>
+                <p><strong>Previous Close:</strong> ${{ stock.previous_close }}</p>
+                <p><strong>Percent Change:</strong> {{ stock.percent_change }}%</p>
                 <p><strong>Market Cap:</strong> ${{ stock.market_cap }} billion</p>
                 <p><strong>Opening Price:</strong> ${{ stock.open_price }}</p>
                 <p><strong>Highest Price (Today):</strong> ${{ stock.high_price }}</p>
@@ -19,29 +22,30 @@
             <div class="buy-sell-recommendation mt-3">
                 <h4>Recommendation: <span class="{{ recommendation_class }}">{{ stock.recommendation }}</span></h4>
                 <!-- Logic to determine the recommendation_class based on buy/sell/hold recommendation should be handled in views.py -->
+                <a href="/" class="btn btn-primary mt-2">Back</a>
             </div>
         </div>
         <div class="col-12 col-lg-6 py-3">
             <h3>Latest News</h3>
             {% for news in news_list %}
                 <div class="news-item card mb-3">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="{{ news.image }}" class="img-fluid rounded-start" alt="{{ news.headline }}">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ news.headline }}</h5>
-                                <p class="card-text">{{ news.summary }}</p>
-                                <p class="card-text"><small class="text-muted">{{ news.datetime|date:"F d, Y" }}</small></p>
-                            </div>
-                        </div>
+                    {% if news.image %}
+                        <img src="{{ news.image }}" class="card-img-top" alt="{{ news.headline }}">  <!-- Image on top -->
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ news.headline }}</h5>
+                        <p class="card-text">{{ news.summary }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">{{ news.datetime|date:"F d, Y" }}</small>
+                        </p>
                     </div>
                 </div>
             {% endfor %}
-            <a href="#" class="text-decoration-none">More News</a>
+            <!--<a href="#" class="text-decoration-none">More News</a>-->
         </div>
     </div>
+</div>
+<div class="container-fluid">
     <div class="row vh-40">
         <div class="col-12 py-3">
             {% include 'stocks_list.html' %}
@@ -51,23 +55,37 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="https://cdn.your-chart-library.com/library.js"></script> <!-- Replace with your actual chart library CDN -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // This should be the actual data from your Django context, passed into the JavaScript code.
+    // Ensure the data is formatted as an array of objects, each containing 'x', 'open', 'high', 'low', 'close' properties.
+    // For instance: [{ x: '2022-01-01', y: [open, high, low, close] }, ...]
     var candlestickData = {{ candlestick_data|safe }};
 
-    // Options and setup for your chart, this will depend heavily on what your chart library requires.
     var options = {
         series: [{
-            data: candlestickData  // this structure depends on your chart library's requirements
+            data: candlestickData  // ensure this is the correct structure
         }],
-        // ... other options like axes, labels, colors, etc.
+        chart: {
+            type: 'candlestick',
+            height: 350
+        },
+        title: {
+            text: '{{ stock.name }} Stock Price',
+            align: 'left'
+        },
+        xaxis: {
+            type: 'datetime'
+        },
+        yaxis: {
+            tooltip: {
+                enabled: true
+            }
+        }
     };
 
-    // Creating the chart inside the 'candlestickChart' container
-    var chart = new YourChartLibrary.createChart(document.getElementById('candlestickChart'), options);
-    // Replace 'YourChartLibrary.createChart' with the actual method your library uses
+    var chart = new ApexCharts(document.querySelector("#candlestickChart"), options);
+    chart.render();
 });
 </script>
 {% endblock %}

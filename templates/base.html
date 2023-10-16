@@ -49,10 +49,11 @@
 
 <body class="g-sidenav-show  bg-gray-200">
 
-    {% include "includes/sidebar.html" %}
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        {% include "includes/navigation.html" %}
-        {% block content %}{% endblock content %}
+        <div class="container">
+            {% include "includes/navigation.html" %}
+            {% block content %}{% endblock content %}
+        </div>
     </main>
     <!-- APP Configurator -->
     {% include "includes/fixed-plugin.html" %}
@@ -74,9 +75,8 @@
     }
   </script>
   <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="{% static 'js/material-dashboard.min.js' %}"></script>
+  <!-- <script async defer src="https://buttons.github.io/buttons.js"></script>-->
+  <!-- <script src="{% static 'js/material-dashboard.min.js' %}"></script> -->
 
 </body>
 
