@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row vh-60">
+        <div class="col-12 col-lg-6 py-3">
+            <h2 class="d-inline-block">{{ stock.name }} ({{ stock.symbol }})</h2>
+            <h3 class="d-inline-block">{{ stock.recommendation }}</h3>
+            <div id="candlesticks" class="candlesticks mt-3">
+                <!-- Candlesticks Section: Consider embedding a JavaScript-based charting library for rendering candlesticks -->
+            </div>
+            <div class="financial-data mt-3">
+                <p>Price: {{ stock.price }}</p>
+                <p>Market Cap: {{ stock.market_cap }}</p>
+                <!-- Additional financial details can be added here -->
+            </div>
+            <div class="buy-sell-recommendation mt-3">
+                <h4>Recommendation: <span class="{{ recommendation_class }}">{{ stock.recommendation }}</span></h4>
+                <!-- Logic to determine the recommendation_class based on buy/sell/hold recommendation should be handled in views.py -->
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 py-3">
+            <h3>Latest News</h3>
+            {% for news in news_list %}
+                <div class="news-item card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{{ news.image }}" class="img-fluid rounded-start" alt="{{ news.headline }}">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ news.headline }}</h5>
+                                <p class="card-text">{{ news.summary }}</p>
+                                <p class="card-text"><small class="text-muted">{{ news.datetime|date:"F d, Y" }}</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <a href="#" class="text-decoration-none">More News</a>
+        </div>
+    </div>
+    <div class="row vh-40">
+        <div class="col-12 py-3">
+            {% include 'stocks_list.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}
