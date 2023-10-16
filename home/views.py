@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from finnhub import Client
 import os
+from datetime import datetime
 
 
 # Create your views here.
@@ -94,8 +95,9 @@ def stock_detail_view(request, symbol):
         # Add more properties as needed
     }
 
+    current_date = datetime.now().strftime("%Y-%m-%d")
     # Example of fetching news from the Finnhub API, replace with actual logic
-    news_list = finnhub_client.company_news(symbol, _from="2022-01-01", to="2022-12-31")
+    news_list = finnhub_client.company_news(symbol, _from="2022-01-01", to=current_date)[:5]
 
     context = {
         'stock': stock,
