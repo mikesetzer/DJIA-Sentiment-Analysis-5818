@@ -117,6 +117,7 @@ def stock_detail_view(request, symbol):
     # Construct the stock information dictionary
     stock = {
         'name': company_info['name'],
+        'symbol': symbol,
         'recommendation': recommendation,
         'price': quote['c'],
         'previous_close': quote['pc'],
