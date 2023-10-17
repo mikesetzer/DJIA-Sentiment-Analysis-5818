@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Stocks List{% endblock %}
+
+{% block content %}
+    <h1>Stocks List</h1>
+    <table class="table table-dark table-striped table-responsive table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Change</th>
+                <th scope="col">% Change</th>
+                <th scope="col">Low</th>
+                <th scope="col">High</th>
+                <th scope="col">Prev Close</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in stocks_list %}
+                <tr class="clickable-row my-2" data-href="{% url 'stock_detail' stock.symbol %}">
+                    <td>{{ stock.symbol }}</td>
+                    <td>{{ stock.name }}</td>
+                    <td>{{ stock.price }}</td>
+                    <td>{{ stock.change }}</td>
+                    <td>{{ stock.percent_change }}</td>
+                    <td>{{ stock.low }}</td>
+                    <td>{{ stock.high }}</td>
+                    <td>{{ stock.prev_close }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var rows = document.querySelectorAll('.clickable-row');
+
+            rows.forEach(function(row) {
+                row.addEventListener('click', function() {
+                    var href = this.dataset.href;
+                    if(href) {
+                        window.location.href = href;
+                    }
+                });
+            });
+        });
+    </script>
+    <style>
+        .clickable-row {
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
