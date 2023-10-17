@@ -60,7 +60,7 @@ class Recommendation(models.Model):
                                             choices=RecommendationChoices.choices, max_length=20)
 
     def __str__(self):
-        return self.stock.ticker + " - " + str(self.date) + " - " + str(self.score)
+        return self.stock.ticker + " - " + str(self.date) + " - " + str(self.sentiment_score) + " - " + str(self.total_recommendation)
 
 
 class SentimentScore(models.Model):
