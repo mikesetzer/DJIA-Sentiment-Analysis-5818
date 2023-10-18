@@ -7,7 +7,7 @@ class Stock(models.Model):
     company = models.CharField(max_length=10, help_text="The name of the company that issued the stock.")
 
     def __str__(self):
-        return self.ticker + " - " + self.company
+        return '{} - {}'.format(self.ticker, self.company)
 
 
 class Recommendation(models.Model):
@@ -37,5 +37,4 @@ class Recommendation(models.Model):
                                             choices=RecommendationChoices.choices, max_length=20)
 
     def __str__(self):
-        return self.stock.ticker + " - " + str(self.date) + " - " + str(self.sentiment_score) + " - " + str(
-            self.total_recommendation)
+        return '{} - {} - {} - {}'.format(self.stock.ticker, self.date, self.sentiment_score, self.total_recommendation)
