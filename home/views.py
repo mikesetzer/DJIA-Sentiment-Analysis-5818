@@ -6,6 +6,7 @@ from datetime import datetime
 from django.shortcuts import render, redirect
 from finnhub import Client
 
+from core.settings import BASE_DIR
 from home.models import Stock, Recommendation
 
 
@@ -126,8 +127,21 @@ def stock_detail_view(request, symbol):
     return render(request, 'stock_detail.html', context)
 
 
-# Populates the database with our initial list of stocks, if they are not already present
+# Populates the database with our initial list of stocks and recommendations
 def load_db_view(request):
+    load_db_with_stocks()
+
+    csvfilename = os.path.join(BASE_DIR, 'dataload', 'COP_DJIA_Total_Dataset.csv')
+    load_db_with_recommendations(csvfilename)
+
+    print("Import complete")
+
+    # redirect to the home page
+    return redirect(home_view)  # return HttpResponse('Import complete')
+
+
+# Populates the database with our list of stocks, if they are not already present
+def load_db_with_stocks():
     stock_symbols_and_names = {'AAPL': 'Apple Inc.', 'BA': 'The Boeing Company', 'CAT': 'Caterpillar Inc.',
                                'CRM': 'Salesforce.com, Inc.', 'CSCO': 'Cisco Systems, Inc.',
                                'CVX': 'Chevron Corporation', 'DIS': 'The Walt Disney Company', 'DOW': 'Dow Inc.',
@@ -151,11 +165,13 @@ def load_db_view(request):
             s = Stock.objects.create(ticker=symbol, company=company_name)
             print('Stock added to database "{}" "{}"'.format(s.ticker, s.company))
 
-    # todo: relocate this csv file and create a setting for this
-    csvfilename = "C:\\Code\\DJIA-Sentiment-Analysis-5818\\stocks\\management\\commands\\COP_DJIA_Total_Dataset.csv"
+    print("Stock load complete")
 
+
+# Populates the database with our recommendations, if they are not already present
+def load_db_with_recommendations(csvfilename):
     with open(csvfilename, "r") as csvfile:
-        heading = next(csvfile)  # skip heading
+        _ = next(csvfile)  # this skips the first row of the csv file which contains the headings
 
         model_data = csv.reader(csvfile)
         for i, row in enumerate(model_data):
@@ -176,11 +192,9 @@ def load_db_view(request):
                                                                                rec.total_recommendation))
             else:
                 print('Recommendation already present "{}" "{}"'.format(stock.ticker, rec.date))
+            print(rec)
 
-        print("Import complete")
-
-    # redirect to the home page
-    return redirect(home_view)  # return HttpResponse('Import complete')
+    print("Recommendation load complete")
 
 
 # Retrieve the most recent recommendation for the given stock ticker
