@@ -38,3 +38,23 @@ class Recommendation(models.Model):
 
     def __str__(self):
         return '{} - {} - {} - {}'.format(self.stock.ticker, self.date, self.sentiment_score, self.total_recommendation)
+
+
+class StockQuote(models.Model):
+    """The stock quote data from the finnhub api on a given date.
+    Refer to https://finnhub.io/docs/api/quote."""
+
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    date = models.DateField(help_text="Date for the stock quote.")
+    current_price = models.DecimalField(help_text="The current stock price. ('c')", max_digits=18, decimal_places=4)
+    change = models.DecimalField(help_text="The change in stock price. ('d')", max_digits=18, decimal_places=4)
+    percent_change = models.DecimalField(help_text="The percent change in stock price. ('dp')", max_digits=18, decimal_places=4)
+    high_price = models.DecimalField(help_text="The high price of the day. ('h')", max_digits=18, decimal_places=4)
+    low_price = models.DecimalField(help_text="The low price of the day. ('l')", max_digits=18, decimal_places=4)
+    open_price = models.DecimalField(help_text="The open price of the day. ('o')", max_digits=18, decimal_places=4)
+    prev_close_price = models.DecimalField(help_text="The previous closing price. ('pc')", max_digits=18, decimal_places=4)
+    time_stamp = models.IntegerField(help_text="The timestamp when the quote was retrieved. ('t')")
+
+
+    def __str__(self):
+        return '{} - {} - {}'.format(self.stock.ticker, self.date, self.current_price)
