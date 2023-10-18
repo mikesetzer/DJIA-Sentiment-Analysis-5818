@@ -4,9 +4,9 @@ import time
 from datetime import datetime
 
 from django.shortcuts import render, redirect
-from finnhub import Client
 
 from core.settings import BASE_DIR
+from home.StockAPIClient import StockAPIClient
 from home.models import Stock, Recommendation
 
 
@@ -17,7 +17,7 @@ def home_view(request):
     if finnhub_api_key is None:
         raise ValueError("API Key for Finnhub is missing!")
 
-    finnhub_client = Client(api_key=finnhub_api_key)
+    finnhub_client = StockAPIClient(api_key=finnhub_api_key)
 
     stocks_list = []
 
@@ -50,7 +50,7 @@ def stock_detail_view(request, symbol):
     if finnhub_api_key is None:
         raise ValueError("API Key for Finnhub is missing!")
 
-    finnhub_client = Client(api_key=finnhub_api_key)
+    finnhub_client = StockAPIClient(api_key=finnhub_api_key)
 
     # Get general information about the company
     company_info = finnhub_client.company_profile2(symbol=symbol)
