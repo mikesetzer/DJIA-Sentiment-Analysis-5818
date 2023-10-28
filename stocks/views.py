@@ -19,7 +19,7 @@ def stocks(request):
 
 # Retrieve and display stock price information for the given ticker on the given date
 def stock_details(request):
-    # http://127.0.0.1:8000/stock_details?ticker=AAPL&price_date=2023-07-31
+    # http://127.0.0.1:8000/stockdetails?ticker=AAPL&price_date=2023-07-31
     ticker = request.GET.get("ticker") or "AAPL"
     price_date = request.GET.get("price_date") or (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
     price_date = datetime.strptime(price_date, "%Y-%m-%d").date()
