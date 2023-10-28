@@ -18,4 +18,4 @@ python manage.py migrate
 python manage.py import_stocks
 
 # Build recommendations database
-python manage.py load_database 
+python manage.py load_database
