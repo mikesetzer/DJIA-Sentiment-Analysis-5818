@@ -21,8 +21,7 @@
             </div>
             <div class="buy-sell-recommendation mt-3">
                 <h4>Recommendation: <span class="{{ recommendation_class }}">{{ stock.recommendation }}</span></h4>
-                <!-- Logic to determine the recommendation_class based on buy/sell/hold recommendation should be handled in views.py -->
-                <a href="/" class="btn btn-primary mt-2">Back</a>
+                <a href="/static" class="btn btn-primary mt-2">Back</a>
             </div>
         </div>
         <div class="col-12 col-lg-6 py-3">
@@ -30,7 +29,7 @@
             {% for news in news_list %}
                 <div class="news-item card mb-3">
                     {% if news.image %}
-                        <img src="{{ news.image }}" class="card-img-top" alt="{{ news.headline }}">  <!-- Image on top -->
+                        <img src="{{ news.image }}" class="card-img-top" alt="{{ news.headline }}">
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ news.headline }}</h5>
@@ -40,52 +39,54 @@
                         </p>
                     </div>
                 </div>
+            {% empty %}
+                <p>No news available.</p>
             {% endfor %}
-            <!--<a href="#" class="text-decoration-none">More News</a>-->
         </div>
     </div>
 </div>
-<!--<div class="container-fluid">
-    <div class="row vh-40">
-        <div class="col-12 py-3">
-            {//% include 'stocks_list.html' %}
-        </div>
-    </div>
-</div>-->
 {% endblock %}
 
 {% block javascript %}
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Ensure the data is formatted as an array of objects, each containing 'x', 'open', 'high', 'low', 'close' properties.
-    // For instance: [{ x: '2022-01-01', y: [open, high, low, close] }, ...]
     var candlestickData = {{ candlestick_data|safe }};
 
-    var options = {
-        series: [{
-            data: candlestickData  // ensure this is the correct structure
-        }],
-        chart: {
-            type: 'candlestick',
-            height: 350
-        },
-        title: {
-            text: '{{ stock.name }} Stock Price',
-            align: 'left'
-        },
-        xaxis: {
-            type: 'datetime'
-        },
-        yaxis: {
-            tooltip: {
-                enabled: true
+    // Ensure the candlestickData is in the correct format
+    if (!Array.isArray(candlestickData) || candlestickData.length === 0) {
+        document.getElementById('candlesticks').innerHTML = '<p>Data not available for chart.</p>';
+    } else {
+        var options = {
+            series: [{
+                data: candlestickData.map(function (item) {
+                    return {
+                        x: new Date(item.timestamp * 1000),  // Convert timestamp to milliseconds
+                        y: [item.open, item.high, item.low, item.close]
+                    };
+                })
+            }],
+            chart: {
+                type: 'candlestick',
+                height: 350
+            },
+            title: {
+                text: '{{ stock.name }} Stock Price',
+                align: 'left'
+            },
+            xaxis: {
+                type: 'datetime'
+            },
+            yaxis: {
+                tooltip: {
+                    enabled: true
+                }
             }
-        }
-    };
+        };
 
-    var chart = new ApexCharts(document.querySelector("#candlestickChart"), options);
-    chart.render();
+        var chart = new ApexCharts(document.querySelector("#candlestickChart"), options);
+        chart.render();
+    }
 });
 </script>
 {% endblock %}

@@ -126,16 +126,20 @@ def test_bulk_load_db_stock_price_history():
 
     price_count = 0
     for stock in Stock.objects.all():
-        print(stock.ticker)
-        price_dict = get_closing_stock_prices_date_range(stock.ticker, dt_from, dt_to)
-        # print(price_dict)
+        try:
+            print(stock.ticker)
+            price_dict = get_closing_stock_prices_date_range(stock.ticker, dt_from, dt_to)
+            # print(price_dict)
 
-        for dt, prc in price_dict.items():
-            sp, created = StockPrice.objects.get_or_create(stock=stock, date=dt, defaults={'price': prc})
+            for dt, prc in price_dict.items():
+                sp, created = StockPrice.objects.get_or_create(stock=stock, date=dt, defaults={'price': prc})
 
-            if created:
-                print('Created StockPrice "{}" "{}" "{}"'.format(stock.ticker, sp.date, sp.price))
-                price_count += 1
+                if created:
+                    print('Created StockPrice "{}" "{}" "{}"'.format(stock.ticker, sp.date, sp.price))
+                    price_count += 1
+
+        except Exception as e:
+            logger.error(f"Error processing stock {stock.ticker}: {e}")
 
     return price_count
 

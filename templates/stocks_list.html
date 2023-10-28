@@ -19,7 +19,7 @@
         </thead>
         <tbody>
             {% for stock in stocks_list %}
-                <tr class="clickable-row my-2" data-href="{% url 'stock_detail' stock.symbol %}">
+                <tr class="clickable-row" data-href="{% url 'stock_detail' stock.symbol %}">
                     <td>{{ stock.symbol }}</td>
                     <td>{{ stock.name }}</td>
                     <td>{{ stock.price }}</td>
@@ -28,6 +28,10 @@
                     <td>{{ stock.low }}</td>
                     <td>{{ stock.high }}</td>
                     <td>{{ stock.prev_close }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center">No stock information available.</td>
                 </tr>
             {% endfor %}
         </tbody>
