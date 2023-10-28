@@ -3,7 +3,7 @@
 set -o errexit
 
 # Upgrade pip to the latest version
-python -m pip install --upgrade pip
+#python -m pip install --upgrade pip
 
 # Install required Python packages
 pip install -r requirements.txt
