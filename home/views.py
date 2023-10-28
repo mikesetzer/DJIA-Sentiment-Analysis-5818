@@ -112,6 +112,10 @@ def stock_detail_view(request, symbol):
 def load_db_view(request):
     load_db_with_stocks()
     csvfilename = os.path.join(settings.BASE_DIR, 'dataload', 'COP_DJIA_Total_Dataset.csv')
+    print(f"CSV file path: {csvfilename}")
+    # Check if the file exists
+    if not os.path.exists(csvfilename):
+        print("Error: CSV file does not exist.")
     load_db_with_recommendations(csvfilename)
     return redirect(home_view)
 
@@ -164,7 +168,7 @@ def load_db_with_recommendations(csvfilename):
                 stock, _ = Stock.objects.get_or_create(ticker=symbol)
 
                 # Ensure the date format matches what your database expects
-                recommendation_date = datetime.strptime(row['recommendation_date'], '%Y-%m-%d').date()
+                recommendation_date = datetime.strptime(row['date'], '%Y-%m-%d').date()
 
                 Recommendation.objects.get_or_create(
                     stock=stock,
