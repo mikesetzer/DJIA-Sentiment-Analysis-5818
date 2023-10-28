@@ -4,7 +4,7 @@ from django.db import models
 class Stock(models.Model):
     """A publicly traded stock"""
     ticker = models.CharField(max_length=10, help_text="The ticker associated with the stock.")
-    company = models.CharField(max_length=255, null=True, blank=True,  help_text="The name of the company that issued the stock.")
+    company = models.CharField(max_length=255,  help_text="The name of the company that issued the stock.")
 
     def __str__(self):
         return '{} - {}'.format(self.ticker, self.company)

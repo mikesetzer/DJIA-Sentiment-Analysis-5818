@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from home import views
 
 urlpatterns = [
     path('', include('home.urls')),
-    path('', include('stocks.urls')),
     path("admin/", admin.site.urls),
-    path("", include('admin_material.urls'))
+    path("", include('admin_material.urls')),
+    path('load_db/', views.load_db_view, name='load_db'),  # This line maps the URL "load_db/" to your function
+
 ]

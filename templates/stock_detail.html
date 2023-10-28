@@ -5,7 +5,7 @@
     <div class="row vh-60">
         <div class="col-12 col-lg-6 py-3">
             <h2 class="d-inline-block">{{ stock.name }} ({{ stock.symbol }})</h2>
-            <h3 class="d-inline-block">{{ stock.recommendation }}</h3>
+            <h3 class="d-inline-block"> - {{ stock.recommendation }}</h3>
             <div id="candlesticks" class="candlesticks mt-3">
                 <!-- Candlestick chart will be rendered here -->
                 <div id="candlestickChart" style="height: 300px;"></div>
@@ -21,7 +21,7 @@
             </div>
             <div class="buy-sell-recommendation mt-3">
                 <h4>Recommendation: <span class="{{ recommendation_class }}">{{ stock.recommendation }}</span></h4>
-                <a href="/static" class="btn btn-primary mt-2">Back</a>
+                <a href="/" class="btn btn-primary mt-2">Back</a>
             </div>
         </div>
         <div class="col-12 col-lg-6 py-3">

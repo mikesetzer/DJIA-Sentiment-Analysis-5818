@@ -51,8 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    "home",
-    "stocks"
+    "home"
 ]
 
 MIDDLEWARE = [
@@ -68,12 +67,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "core.urls"
 
-UI_TEMPLATES = os.path.join(BASE_DIR, 'home/../templates')
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [UI_TEMPLATES],
+        "DIRS": [TEMPLATES_DIR],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -145,19 +144,16 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
+# Correcting the path for static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'home/../static'),
-)
+STATIC_DIR = os.path.join(BASE_DIR, 'static')  # This should be the correct path if your static folder is at the project root
+STATICFILES_DIRS = [STATIC_DIR]
 
 #if not DEBUG:
 #    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

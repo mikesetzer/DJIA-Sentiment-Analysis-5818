@@ -12,7 +12,7 @@ from core.settings import BASE_DIR
 from home.StockAPIClient import StockAPIClient
 from home.models import Stock, Recommendation
 from django.conf import settings
-
+print(Recommendation.objects.all().count())
 
 def home_view(request):
     finnhub_api_key = os.getenv('FINNHUB_API_KEY')
@@ -111,26 +111,73 @@ def stock_detail_view(request, symbol):
 
 def load_db_view(request):
     load_db_with_stocks()
-    csvfilename = os.path.join(BASE_DIR, 'dataload', 'COP_DJIA_Total_Dataset.csv')
+    csvfilename = os.path.join(settings.BASE_DIR, 'dataload', 'COP_DJIA_Total_Dataset.csv')
     load_db_with_recommendations(csvfilename)
     return redirect(home_view)
 
 def load_db_with_stocks():
-    stock_symbols_and_names = {
-        # ... [your existing dictionary content] ...
-    }
-    for symbol, company_name in stock_symbols_and_names.items():
-        s, created = Stock.objects.get_or_create(ticker=symbol, company=company_name)
-        if created:
-            print(f'Stock added to database "{s.ticker}" "{s.company}"')
+    # Specify the path to your CSV file. Adjust the subdirectory as needed.
+    csv_file_path = os.path.join(settings.BASE_DIR, 'dataload', 'DJIAStockList.csv')
+
+    # Counter for statistics
+    created_count = 0
+    updated_count = 0
+
+    try:
+        # Use Python's built-in CSV reader to process the file.
+        with open(csv_file_path, mode='r', newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+
+            # For each row in the CSV, create an entry in the database.
+            for row in reader:
+                ticker = row['ticker']
+                company = row['company']
+
+                # Create a new stock entry or update the existing one.
+                stock, created = Stock.objects.update_or_create(
+                    ticker=ticker,  # look up by ticker
+                    defaults={'company': company}  # fields to update
+                )
+
+                # Print the status to the console (or log, if you prefer).
+                if created:
+                    print(f'Created new stock: {ticker} - {company}')
+                    created_count += 1
+                else:
+                    print(f'Updated stock: {ticker} - {company}')
+                    updated_count += 1
+
+        # Print summary of the operation.
+        print(f'Operation completed. {created_count} stocks created, {updated_count} stocks updated.')
+
+    except Exception as e:
+        # If an error occurs during the process, print it to the console.
+        print(f'An error occurred during the stock loading process: {e}')
+
 
 def load_db_with_recommendations(csvfilename):
-    with open(csvfilename, mode='r') as csvfile:
-        csv_reader = csv.DictReader(csvfile)
-        for row in csv_reader:
-            symbol = row['symbol']
-            stock, _ = Stock.objects.get_or_create(ticker=symbol)
-            Recommendation.objects.get_or_create(stock=stock, date=row['recommendation_date'], defaults={'sentiment_score': row['sentiment_score'], 'stock_recommendation': row['stock_rec'], 'total_recommendation': row['total_rec']})
+    try:
+        with open(csvfilename, mode='r') as csvfile:
+            csv_reader = csv.DictReader(csvfile)
+            for row in csv_reader:
+                symbol = row['symbol']
+                stock, _ = Stock.objects.get_or_create(ticker=symbol)
+
+                # Ensure the date format matches what your database expects
+                recommendation_date = datetime.strptime(row['recommendation_date'], '%Y-%m-%d').date()
+
+                Recommendation.objects.get_or_create(
+                    stock=stock,
+                    date=recommendation_date,
+                    defaults={
+                        'sentiment_score': row['sentiment_score'],
+                        'stock_recommendation': row['stock_rec'],
+                        'total_recommendation': row['total_rec']
+                    }
+                )
+        print("Recommendations data loaded successfully.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 def get_most_recent_stock_rec(ticker):
     latest_recommendation = Recommendation.objects.filter(stock__ticker=ticker).order_by('-date').first()
