@@ -15,7 +15,7 @@ from django.conf import settings
 print(Recommendation.objects.all().count())
 
 def home_view(request):
-    finnhub_api_key = os.getenv('FINNHUB_API_KEY')
+    finnhub_api_key = os.getenv('FINNHUB_API_KEY_STOCKS')
     if not finnhub_api_key:
         raise ValueError("API Key for Finnhub is missing!")
 
@@ -56,7 +56,7 @@ def home_view(request):
 
 
 def stock_detail_view(request, symbol):
-    finnhub_api_key = os.getenv('FINNHUB_API_KEY')
+    finnhub_api_key = os.getenv('FINNHUB_API_KEY_NEWS')
     if not finnhub_api_key:
         raise ValueError("API Key for Finnhub is missing!")
 
