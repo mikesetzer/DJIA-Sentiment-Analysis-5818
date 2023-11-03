@@ -11,14 +11,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# running migrations
-RUN python manage.py migrate
-
-# Custom command to load stock data into your database
-RUN python manage.py import_stocks
-
-# Build recommendations database
-RUN python manage.py load_database
-
 # gunicorn
 CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.wsgi"]
