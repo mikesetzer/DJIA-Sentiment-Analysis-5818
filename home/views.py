@@ -12,7 +12,6 @@ from core.settings import BASE_DIR
 from home.StockAPIClient import StockAPIClient
 from home.models import Stock, Recommendation
 from django.conf import settings
-print(Recommendation.objects.all().count())
 
 def home_view(request):
     finnhub_api_key = os.getenv('FINNHUB_API_KEY')
