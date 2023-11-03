@@ -1,5 +1,5 @@
 finnhub-python>=2.4.18
-django>=4.2.5
+django>=4.1.12
 gunicorn~=21.2.0
 python-dotenv>=1.0.0
 whitenoise
