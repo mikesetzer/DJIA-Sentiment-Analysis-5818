@@ -21,4 +21,4 @@ https://render.com/docs/deploy-django
   - Click `New Blueprint Instance` button.
   - Connect your `repo` which you want to deploy.
   - Fill the `Service Group Name` and click on `Update Existing Resources` button.
-  - After that your deployment will start automatically.
+  - After that your deployment will start automatically. 
