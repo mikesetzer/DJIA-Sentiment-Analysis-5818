@@ -11,5 +11,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# running migrations
+RUN python manage.py migrate
+RUN python manage.py import_stocks
+RUN python manage.py load_database
+
 # gunicorn
 CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.wsgi"]
