@@ -27,8 +27,8 @@ COPY . .
 # Collect static files
 RUN python manage.py collectstatic --no-input
 
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
+# Make port 5005 available to the world outside this container
+EXPOSE 5005
 
 # Run the entrypoint script to start the application
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
