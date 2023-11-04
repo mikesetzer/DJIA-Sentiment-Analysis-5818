@@ -20,7 +20,7 @@
                   {% if request.user.is_superuser %}
                     <a class="nav-link d-flex align-items-center me-2 active" aria-current="page" href="{% url 'admin:index' %}">
                   {% else %}
-                    <a class="nav-link d-flex align-items-center me-2 active" aria-current="page" href="/static">
+                    <a class="nav-link d-flex align-items-center me-2 active" aria-current="page" href="/">
                   {% endif %}
                     <i class="fa fa-chart-pie opacity-6 text-dark me-1"></i>
                     Dashboard
