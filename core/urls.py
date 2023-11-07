@@ -20,7 +20,7 @@ from home import views
 urlpatterns = [
     path('', include('home.urls')),
     path("admin/", admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path("", include('admin_material.urls')),
     path('load_db/', views.load_db_view, name='load_db'),  # This line maps the URL "load_db/" to your function
-
 ]
