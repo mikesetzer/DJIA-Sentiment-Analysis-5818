@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
 
     "home"
 ]
@@ -87,22 +88,15 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': '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',
             'key': ''
         }
+    },
+    'github': {
+        'APP': {
+            'client_id': '67085867f739a824fd56',
+            'secret': '4dfd8c5ec9c6aae1d8e4032d56ffeac0b4d01c5d',
+            'key': ''
+        }
     }
 }
-#
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         'SCOPE': [
-#             'profile',
-#             'email',
-#         ],
-#         'AUTH_PARAMS': {
-#             'access_type': 'online',
-#         },
-#         'OAUTH_PKCE_ENABLED': True,
-#     }
-# }
-
 
 
 
