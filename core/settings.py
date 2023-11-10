@@ -78,26 +78,46 @@ MIDDLEWARE = [
 
 
 # Provider specific settings
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        # For each OAuth based provider, either add a ``SocialApp``
-        # (``socialaccount`` app) containing the required client
-        # credentials, or list them here:
-        'APP': {
-            'client_id': '640999026296-uniehq70nltkbpf8spib4fg1mf9648v5.apps.googleusercontent.com',
-            'secret': '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',
-            'key': ''
-        }
-    },
-    'github': {
-        'APP': {
-            'client_id': '67085867f739a824fd56',
-            'secret': '4dfd8c5ec9c6aae1d8e4032d56ffeac0b4d01c5d',
-            'key': ''
+if DEBUG:
+    SOCIALACCOUNT_PROVIDERS = {
+        'google': {
+            # For each OAuth based provider, either add a ``SocialApp``
+            # (``socialaccount`` app) containing the required client
+            # credentials, or list them here:
+            'APP': {
+                'client_id': '640999026296-uniehq70nltkbpf8spib4fg1mf9648v5.apps.googleusercontent.com',
+                'secret': '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',
+                'key': ''
+            }
+        },
+        'github': {
+            'APP': {
+                'client_id': '67085867f739a824fd56',
+                'secret': '4dfd8c5ec9c6aae1d8e4032d56ffeac0b4d01c5d',
+                'key': ''
+            }
         }
     }
-}
-
+else:
+    SOCIALACCOUNT_PROVIDERS = {
+        'google': {
+            # For each OAuth based provider, either add a ``SocialApp``
+            # (``socialaccount`` app) containing the required client
+            # credentials, or list them here:
+            'APP': {
+                'client_id': '640999026296-uniehq70nltkbpf8spib4fg1mf9648v5.apps.googleusercontent.com',
+                'secret': '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',
+                'key': ''
+            }
+        },
+        'github': {
+            'APP': {
+                'client_id': 'fb8705d61cc9ae7a7a46',
+                'secret': '0caa05b88ee5c063b7adcb381d71567efa5180f4',
+                'key': ''
+            }
+        }
+    }
 
 
 ROOT_URLCONF = "core.urls"
