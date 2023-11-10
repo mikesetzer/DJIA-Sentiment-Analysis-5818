@@ -1,9 +1,12 @@
-{% extends "account/base_entrance.html" %}
+{% extends 'base.html' %}
 {% load i18n %}
 {% load allauth account socialaccount %}
-{% block head_title %}
+
+
+{% block title %}
     {% trans "Sign In" %}
-{% endblock head_title %}
+{% endblock title %}
+
 {% block content %}
     {% element h1 %}
         {% trans "Sign In" %}
