@@ -14,41 +14,43 @@ from home.models import Stock, Recommendation
 from django.conf import settings
 
 def home_view(request):
-    finnhub_api_key = os.getenv('FINNHUB_API_KEY_STOCKS')
-    if not finnhub_api_key:
-        raise ValueError("API Key for Finnhub is missing!")
-
-    finnhub_client = StockAPIClient(api_key=finnhub_api_key)
     stocks_list = []
 
-    stocks = Stock.objects.all().order_by('ticker')
-    if not stocks:
-        context = {'error': 'No stock information available.'}
-    else:
-        for stock in stocks:
-            try:
-                quote = finnhub_client.quote(stock.ticker)
+    if request.user.is_authenticated:
+        finnhub_api_key = os.getenv('FINNHUB_API_KEY_STOCKS')
+        if not finnhub_api_key:
+            raise ValueError("API Key for Finnhub is missing!")
 
-                if quote and 'c' in quote and 'pc' in quote:
-                    change = quote['c'] - quote['pc']
-                    percent_change = (change / quote['pc']) * 100 if quote['pc'] else 0
+        finnhub_client = StockAPIClient(api_key=finnhub_api_key)
 
-                    stock_info = {
-                        'symbol': stock.ticker,
-                        'name': stock.company,
-                        'price': '${:.2f}'.format(quote['c']),
-                        'change': '$ {:.2f}'.format(change),
-                        'percent_change': f'{percent_change:.2f}%',
-                        'low': '${:.2f}'.format(quote.get('l', 0)),  # default to 0 if not available
-                        'high': '${:.2f}'.format(quote.get('h', 0)),  # default to 0 if not available
-                        'prev_close': '${:.2f}'.format(quote['pc']),
-                    }
+        stocks = Stock.objects.all().order_by('ticker')
+        if not stocks:
+            context = {'error': 'No stock information available.'}
+        else:
+            for stock in stocks:
+                try:
+                    quote = finnhub_client.quote(stock.ticker)
 
-                    stocks_list.append(stock_info)
-            except Exception as e:
-                logger.error(f"Error processing stock {stock.ticker}: {e}")
+                    if quote and 'c' in quote and 'pc' in quote:
+                        change = quote['c'] - quote['pc']
+                        percent_change = (change / quote['pc']) * 100 if quote['pc'] else 0
 
-        context = {'stocks_list': stocks_list}
+                        stock_info = {
+                            'symbol': stock.ticker,
+                            'name': stock.company,
+                            'price': '${:.2f}'.format(quote['c']),
+                            'change': '$ {:.2f}'.format(change),
+                            'percent_change': f'{percent_change:.2f}%',
+                            'low': '${:.2f}'.format(quote.get('l', 0)),  # default to 0 if not available
+                            'high': '${:.2f}'.format(quote.get('h', 0)),  # default to 0 if not available
+                            'prev_close': '${:.2f}'.format(quote['pc']),
+                        }
+
+                        stocks_list.append(stock_info)
+                except Exception as e:
+                    logger.error(f"Error processing stock {stock.ticker}: {e}")
+
+    context = {'stocks_list': stocks_list}
 
     template_path = os.path.join(settings.BASE_DIR, 'templates', 'stocks_list.html')
     return render(request, template_path, context)
