@@ -17,3 +17,4 @@ sqlparse~=0.4.4
 requests~=2.31.0
 packaging~=23.1
 platformdirs~=3.10.0
+django-allauth~=0.58.2
