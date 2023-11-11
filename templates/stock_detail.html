@@ -7,7 +7,6 @@
             <h2 class="d-inline-block">{{ stock.name }} ({{ stock.symbol }})</h2>
             <h3 class="d-inline-block"> - {{ stock.recommendation }}</h3>
             <div id="candlesticks" class="candlesticks mt-3">
-                <!-- Candlestick chart will be rendered here -->
                 <div id="candlestickChart" style="height: 300px;"></div>
             </div>
             <div class="financial-data mt-3">
@@ -47,35 +46,42 @@
 </div>
 {% endblock %}
 
-{% block javascript %}
+{% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
 <script>
+console.log("Script loaded");
 document.addEventListener('DOMContentLoaded', function () {
     var candlestickData = {{ candlestick_data|safe }};
+    console.log("Candlestick Data:", candlestickData);
 
-    // Ensure the candlestickData is in the correct format
     if (!Array.isArray(candlestickData) || candlestickData.length === 0) {
         document.getElementById('candlesticks').innerHTML = '<p>Data not available for chart.</p>';
     } else {
         var options = {
             series: [{
+                name: 'Candle',
                 data: candlestickData.map(function (item) {
                     return {
-                        x: new Date(item.timestamp * 1000),  // Convert timestamp to milliseconds
+                        x: new Date(item.timestamp * 1000),
                         y: [item.open, item.high, item.low, item.close]
                     };
                 })
             }],
             chart: {
                 type: 'candlestick',
-                height: 350
+                height: 300
             },
             title: {
                 text: '{{ stock.name }} Stock Price',
                 align: 'left'
             },
             xaxis: {
-                type: 'datetime'
+                type: 'datetime',
+                labels: {
+                    formatter: function (value) {
+                        return new Date(value).toLocaleDateString();
+                    }
+                }
             },
             yaxis: {
                 tooltip: {
@@ -88,5 +94,6 @@ document.addEventListener('DOMContentLoaded', function () {
         chart.render();
     }
 });
+
 </script>
 {% endblock %}

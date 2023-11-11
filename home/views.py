@@ -2,27 +2,23 @@ import csv
 import os
 import time
 import logging
-logger = logging.getLogger(__name__)
-
 from datetime import datetime
 
-from django.shortcuts import render, redirect, get_object_or_404
-
-from core.settings import BASE_DIR
+from django.shortcuts import render, redirect
 from home.StockAPIClient import StockAPIClient
 from home.models import Stock, Recommendation
 from django.conf import settings
 
+logger = logging.getLogger(__name__)
+
 def home_view(request):
     stocks_list = []
-
     if request.user.is_authenticated:
         finnhub_api_key = os.getenv('FINNHUB_API_KEY_STOCKS')
         if not finnhub_api_key:
             raise ValueError("API Key for Finnhub is missing!")
 
         finnhub_client = StockAPIClient(api_key=finnhub_api_key)
-
         stocks = Stock.objects.all().order_by('ticker')
         if not stocks:
             context = {'error': 'No stock information available.'}
@@ -30,31 +26,26 @@ def home_view(request):
             for stock in stocks:
                 try:
                     quote = finnhub_client.quote(stock.ticker)
-
                     if quote and 'c' in quote and 'pc' in quote:
                         change = quote['c'] - quote['pc']
                         percent_change = (change / quote['pc']) * 100 if quote['pc'] else 0
-
                         stock_info = {
                             'symbol': stock.ticker,
                             'name': stock.company,
                             'price': '${:.2f}'.format(quote['c']),
                             'change': '$ {:.2f}'.format(change),
                             'percent_change': f'{percent_change:.2f}%',
-                            'low': '${:.2f}'.format(quote.get('l', 0)),  # default to 0 if not available
-                            'high': '${:.2f}'.format(quote.get('h', 0)),  # default to 0 if not available
+                            'low': '${:.2f}'.format(quote.get('l', 0)),
+                            'high': '${:.2f}'.format(quote.get('h', 0)),
                             'prev_close': '${:.2f}'.format(quote['pc']),
                         }
-
                         stocks_list.append(stock_info)
                 except Exception as e:
                     logger.error(f"Error processing stock {stock.ticker}: {e}")
 
     context = {'stocks_list': stocks_list}
-
     template_path = os.path.join(settings.BASE_DIR, 'templates', 'stocks_list.html')
     return render(request, template_path, context)
-
 
 def stock_detail_view(request, symbol):
     finnhub_api_key = os.getenv('FINNHUB_API_KEY_NEWS')
@@ -100,7 +91,6 @@ def stock_detail_view(request, symbol):
     current_timestamp = int(time.time())
     ten_days_ago_timestamp = current_timestamp - (10 * 24 * 60 * 60)
     candlestick_data = finnhub_client.stock_candles(symbol=symbol, resolution='D', _from=ten_days_ago_timestamp, to=current_timestamp)
-
     if not candlestick_data or 's' not in candlestick_data or candlestick_data['s'] != 'ok':
         prepared_candlestick_data = []
     else:
@@ -108,57 +98,50 @@ def stock_detail_view(request, symbol):
 
     context = {'stock': stock, 'news_list': news_list[:3], 'candlestick_data': prepared_candlestick_data}
     template_path = os.path.join(settings.BASE_DIR, 'templates', 'stock_detail.html')
+
+    # Check if data is received
+    if not candlestick_data or 's' not in candlestick_data or candlestick_data['s'] != 'ok':
+        logger.error("Failed to fetch candlestick data")
+        prepared_candlestick_data = []
+    else:
+        prepared_candlestick_data = [
+            {'timestamp': candlestick_data['t'][i], 'open': candlestick_data['o'][i], 'high': candlestick_data['h'][i],
+             'low': candlestick_data['l'][i], 'close': candlestick_data['c'][i], 'volume': candlestick_data['v'][i]} for
+            i in range(len(candlestick_data['c']))]
+        logger.info(f"Candlestick Data: {prepared_candlestick_data}")
+
     return render(request, template_path, context)
 
 def load_db_view(request):
     load_db_with_stocks()
     csvfilename = os.path.join(settings.BASE_DIR, 'dataload', 'COP_DJIA_Total_Dataset.csv')
-    print(f"CSV file path: {csvfilename}")
-    # Check if the file exists
     if not os.path.exists(csvfilename):
         print("Error: CSV file does not exist.")
-    load_db_with_recommendations(csvfilename)
+    else:
+        load_db_with_recommendations(csvfilename)
     return redirect(home_view)
 
 def load_db_with_stocks():
-    # Specify the path to your CSV file. Adjust the subdirectory as needed.
     csv_file_path = os.path.join(settings.BASE_DIR, 'dataload', 'DJIAStockList.csv')
-
-    # Counter for statistics
     created_count = 0
     updated_count = 0
-
     try:
-        # Use Python's built-in CSV reader to process the file.
         with open(csv_file_path, mode='r', newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
-
-            # For each row in the CSV, create an entry in the database.
             for row in reader:
                 ticker = row['ticker']
                 company = row['company']
-
-                # Create a new stock entry or update the existing one.
                 stock, created = Stock.objects.update_or_create(
-                    ticker=ticker,  # look up by ticker
-                    defaults={'company': company}  # fields to update
+                    ticker=ticker,
+                    defaults={'company': company}
                 )
-
-                # Print the status to the console (or log, if you prefer).
                 if created:
-                    print(f'Created new stock: {ticker} - {company}')
                     created_count += 1
                 else:
-                    print(f'Updated stock: {ticker} - {company}')
                     updated_count += 1
-
-        # Print summary of the operation.
         print(f'Operation completed. {created_count} stocks created, {updated_count} stocks updated.')
-
     except Exception as e:
-        # If an error occurs during the process, print it to the console.
         print(f'An error occurred during the stock loading process: {e}')
-
 
 def load_db_with_recommendations(csvfilename):
     try:
@@ -167,10 +150,7 @@ def load_db_with_recommendations(csvfilename):
             for row in csv_reader:
                 symbol = row['symbol']
                 stock, _ = Stock.objects.get_or_create(ticker=symbol)
-
-                # Ensure the date format matches what your database expects
                 recommendation_date = datetime.strptime(row['date'], '%Y-%m-%d').date()
-
                 Recommendation.objects.get_or_create(
                     stock=stock,
                     date=recommendation_date,
