@@ -71,6 +71,8 @@ def stock_detail_view(request, symbol):
         raise ValueError(f"No quote available for symbol {symbol}")
 
     recommendation = get_most_recent_stock_rec(symbol)
+    sentiment = get_most_recent_stock_sentiment(symbol)
+
     percent_change = ((quote['c'] - quote['o']) / quote['o']) * 100 if quote.get('o') else None
 
     market_cap_in_billions = None
@@ -82,6 +84,7 @@ def stock_detail_view(request, symbol):
         'name': company_info['name'],
         'symbol': symbol,
         'recommendation': recommendation,
+        'sentiment': sentiment,
         'price': quote['c'],
         'previous_close': quote['pc'],
         'percent_change': f'{percent_change:.2f}%' if percent_change is not None else 'N/A',
@@ -186,4 +189,8 @@ def load_db_with_recommendations(csvfilename):
 
 def get_most_recent_stock_rec(ticker):
     latest_recommendation = Recommendation.objects.filter(stock__ticker=ticker).order_by('-date').first()
-    return latest_recommendation.total_recommendation if latest_recommendation else None
+    return latest_recommendation.total_recommendation.capitalize() if latest_recommendation else None
+
+def get_most_recent_stock_sentiment(ticker):
+    latest_recommendation = Recommendation.objects.filter(stock__ticker=ticker).order_by('-date').first()
+    return latest_recommendation.sentiment_score.capitalize() if latest_recommendation else None
