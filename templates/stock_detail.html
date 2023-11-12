@@ -4,23 +4,51 @@
 <div class="container-fluid">
     <div class="row vh-60">
         <div class="col-12 col-lg-6 py-3">
-            <h2 class="d-inline-block">{{ stock.name }} ({{ stock.symbol }})</h2>
-            <h3 class="d-inline-block"> - {{ stock.recommendation }}</h3>
-            <div id="candlesticks" class="candlesticks mt-3">
-                <div id="candlestickChart" style="height: 300px;"></div>
-            </div>
-            <div class="financial-data mt-3">
-                <p><strong>Current Price:</strong> ${{ stock.price }}</p>
-                <p><strong>Previous Close:</strong> ${{ stock.previous_close }}</p>
-                <p><strong>Percent Change:</strong> {{ stock.percent_change }}%</p>
-                <p><strong>Market Cap:</strong> ${{ stock.market_cap }} billion</p>
-                <p><strong>Opening Price:</strong> ${{ stock.open_price }}</p>
-                <p><strong>Highest Price (Today):</strong> ${{ stock.high_price }}</p>
-                <p><strong>Lowest Price (Today):</strong> ${{ stock.low_price }}</p>
-            </div>
-            <div class="buy-sell-recommendation mt-3">
-                <h4>Recommendation: <span class="{{ recommendation_class }}">{{ stock.recommendation }}</span></h4>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="d-inline-block">{{ stock.name }} ({{ stock.symbol }}) - </h2>
+                    <h3 class="d-inline-block text-decoration-underline"
+                        {% if stock.recommendation == 'Buy' or stock.recommendation == 'Strong Buy' %}
+                            style="color: green;"
+                        {% elif stock.recommendation == 'Sell' or stock.recommendation == 'Strong Sell' %}
+                            style="color: red;"
+                        {% elif stock.recommendation == 'Hold' %}
+                            style="color: #344767;;"
+                        {% endif %}
+                    >
+                        {{ stock.recommendation }}
+                    </h3>
+                    <div id="candlesticks" class="candlesticks mt-3">
+                        <div id="candlestickChart" style="height: 300px;"></div>
+                    </div>
+                    <div class="financial-data mt-3">
+                        <p><strong>Current Price:</strong> ${{ stock.price }}</p>
+                        <p><strong>Previous Close:</strong> ${{ stock.previous_close }}</p>
+                        <p><strong>Percent Change:</strong> {{ stock.percent_change }}%</p>
+                        <p><strong>Market Cap:</strong> ${{ stock.market_cap }} billion</p>
+                        <p><strong>Opening Price:</strong> ${{ stock.open_price }}</p>
+                        <p><strong>Highest Price (Today):</strong> ${{ stock.high_price }}</p>
+                        <p><strong>Lowest Price (Today):</strong> ${{ stock.low_price }}</p>
+                    </div>
+                    <div class="buy-sell-recommendation mt-3">
+                        <h4>Recommendation:
+                            <span class="text-decoration-underline"
+                                {% if stock.recommendation == 'Buy' or stock.recommendation == 'Strong Buy' %}
+                                    style="color: green;"
+                                {% elif stock.recommendation == 'Sell' %}
+                                    style="color: red;"
+                                {% elif stock.recommendation == 'Hold' %}
+                                    style="color: #344767;"
+                                {% endif %}
+                            >
+                                {{ stock.recommendation }}
+                            </span>
+                        </h4>
+
+                    </div>
                 <a href="/" class="btn btn-primary mt-2">Back</a>
+
+                </div>
             </div>
         </div>
         <div class="col-12 col-lg-6 py-3">
