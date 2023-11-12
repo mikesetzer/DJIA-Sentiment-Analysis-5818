@@ -55,18 +55,20 @@
         <div class="col-12 col-lg-6 py-3">
             <h3>Latest News</h3>
             {% for news in news_list %}
-                <div class="news-item card mb-3">
-                    {% if news.image %}
-                        <img src="{{ news.image }}" class="card-img-top" alt="{{ news.headline }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ news.headline }}</h5>
-                        <p class="card-text">{{ news.summary }}</p>
-                        <p class="card-text">
-                            <small class="text-muted">{{ news.datetime|date:"F d, Y" }}</small>
-                        </p>
+                <a href="{{ news.url }}" class="text-decoration-none" target="_blank">
+                    <div class="news-item card mb-3">
+                        {% if news.image %}
+                            <img src="{{ news.image }}" class="card-img-top" alt="{{ news.headline }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ news.headline }}</h5>
+                            <p class="card-text">{{ news.summary }}</p>
+                            <p class="card-text">
+                                <small class="text-muted">{{ news.datetime|date:"F d, Y" }}</small>
+                            </p>
+                        </div>
                     </div>
-                </div>
+                </a>
             {% empty %}
                 <p>No news available.</p>
             {% endfor %}
