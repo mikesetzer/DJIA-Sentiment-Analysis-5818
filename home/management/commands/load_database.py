@@ -1,5 +1,6 @@
 # home/management/commands/load_db_with_stocks.py
 from django.core.management.base import BaseCommand
+from home.views import load_db_with_recommendations
 from home.models import Stock
 from django.conf import settings
 import os
@@ -53,6 +54,12 @@ class Command(BaseCommand):
                 f'Operation completed. {created_count} stocks created, {updated_count} stocks updated, {removed_count} stocks removed.'
             ))
 
+            csvfilename = os.path.join(settings.BASE_DIR, 'dataload', 'COP_DJIA_Total_Dataset.csv')
+            self.stdout.write('Loading recommendations...')
+            load_db_with_recommendations(csvfilename)
+            self.stdout.write(self.style.SUCCESS('Recommendations have been loaded successfully.'))
+
         except Exception as e:
             # If an error occurs during the process, print it to the console
             self.stdout.write(self.style.ERROR(f'An error occurred during the stock loading process: {e}'))
+
