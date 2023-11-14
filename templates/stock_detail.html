@@ -8,11 +8,11 @@
                 <div class="card-body">
                     <h2 class="d-inline-block">{{ stock.name }} ({{ stock.symbol }}) - </h2>
                     <h3 class="d-inline-block text-decoration-underline"
-                        {% if stock.recommendation|lower == 'buy' or stock.recommendation|lower == 'strong buy' %}
+                        {% if stock.recommendation == 'Buy' or stock.recommendation == 'Strong Buy' %}
                             style="color: green;"
-                        {% elif stock.recommendation|lower == 'sell' or stock.recommendation|lower == 'strong sell' %}
+                        {% elif stock.recommendation == 'Sell' or stock.recommendation == 'Strong Sell' %}
                             style="color: red;"
-                        {% elif stock.recommendation|lower == 'hold' %}
+                        {% elif stock.recommendation == 'Hold' %}
                             style="color: #344767;;"
                         {% endif %}
                     >
